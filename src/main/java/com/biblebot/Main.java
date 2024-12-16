@@ -66,6 +66,7 @@ public class Main implements CommandLineRunner {
                 catch (Exception e){
 
                     System.out.println(Arrays.toString(e.getStackTrace()));
+                    System.out.println(e.getLocalizedMessage());
 
                     SendMessage sendMessage = new SendMessage(update.message().chat().id(), "Произошла ошибка");
 
