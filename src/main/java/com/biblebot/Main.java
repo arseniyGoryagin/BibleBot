@@ -40,26 +40,45 @@ public class Main implements CommandLineRunner {
 
             for(Update update : updates){
 
-                String []message = update.message().text().split(" ");
-                String bookName = message[0];
-                String chapter = message[1].split(":")[0];
-                String verseNumber = message[1].split(":")[1];
+                try {
+                    String[] message = update.message().text().split(" ");
+                    String bookName = message[0];
+                    String chapter = message[1].split(":")[0];
+                    String verseNumber = message[1].split(":")[1];
 
-                Verse verse = verseRepository.findByBookNameAndChapterAndVerseNumber(bookName, Integer.parseInt(chapter), Integer.parseInt(verseNumber));
+                    Verse verse = verseRepository.findByBookNameAndChapterAndVerseNumber(bookName, Integer.parseInt(chapter), Integer.parseInt(verseNumber));
 
-                SendMessage sendMessage = new SendMessage(update.message().chat().id(), verse.getVerseText());
+                    SendMessage sendMessage = new SendMessage(update.message().chat().id(), verse.getVerseText());
 
-                bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
-                    @Override
-                    public void onResponse(SendMessage sendMessage, SendResponse sendResponse) {
+                    bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
+                        @Override
+                        public void onResponse(SendMessage sendMessage, SendResponse sendResponse) {
 
-                    }
+                        }
 
-                    @Override
-                    public void onFailure(SendMessage sendMessage, IOException e) {
+                        @Override
+                        public void onFailure(SendMessage sendMessage, IOException e) {
 
-                    }
-                });
+                        }
+                    });
+                }
+                catch (Exception e){
+
+                    SendMessage sendMessage = new SendMessage(update.message().chat().id(), "Произошла ошибка");
+
+                    bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
+                        @Override
+                        public void onResponse(SendMessage sendMessage, SendResponse sendResponse) {
+
+                        }
+
+                        @Override
+                        public void onFailure(SendMessage sendMessage, IOException e) {
+
+                        }
+                    });
+
+                }
             }
 
 
