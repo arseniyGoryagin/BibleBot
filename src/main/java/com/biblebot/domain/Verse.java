@@ -8,7 +8,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name="verses_table")
+@Table(name="verses")
 @Data
 public class Verse {
 
