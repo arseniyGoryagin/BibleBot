@@ -56,7 +56,7 @@ public class Main implements CommandLineRunner {
 
                     Request request = RequestParser.parseRequest(update.message().text());
 
-                    Book book = bookRepository.findByBookNameOrAltOrAbbr(request.getBookName()).orElseThrow(() ->{
+                    Book book = bookRepository.findByBookNameOrAltOrAbbr(request.getBookName(), request.getBookName(), request.getBookName()).orElseThrow(() ->{
                         return new NoSuchElementException("Нету книги с таким названием(");
                     });
 
