@@ -1,7 +1,12 @@
 package com.biblebot;
 
+import com.biblebot.request.domain.Request;
+import com.biblebot.request.RequestParser;
+import com.biblebot.domain.Book;
+import com.biblebot.domain.BookRepository;
 import com.biblebot.domain.Verse;
 import com.biblebot.domain.VerseRepository;
+import com.biblebot.tgbot.TgBotWrapper;
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -26,6 +31,7 @@ public class Main implements CommandLineRunner {
 
 
     private final VerseRepository verseRepository;
+    private final BookRepository bookRepository;
 
 
     public static void main(String[] args) {
@@ -40,73 +46,33 @@ public class Main implements CommandLineRunner {
 
         TelegramBot bot = new TelegramBot(System.getenv("BOT_TOKEN"));
 
+        TgBotWrapper tgBotWrapper = new TgBotWrapper(bot);
+
         bot.setUpdatesListener(updates ->{
 
             for(Update update : updates){
 
                 try {
-                    String[] message = update.message().text().split(" ");
-                    String bookName = message[0];
-                    String chapter = message[1].split(":")[0];
-                    String verseNumber = message[1].split(":")[1];
 
-                    Verse verse = verseRepository.findByBookNameAndChapterAndVerseNumber(bookName, Integer.parseInt(chapter), Integer.parseInt(verseNumber))
-                            .orElseThrow(() -> {
-                                return new NoSuchElementException("Searched for : bookName="+bookName+" chapter="+chapter+" verseNumber="+verseNumber);
-                            });
+                    Request request = RequestParser.parseRequest(update.message().text());
 
-                    SendMessage sendMessage = new SendMessage(update.message().chat().id(), verse.getVerseText());
-
-                    bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
-                        @Override
-                        public void onResponse(SendMessage sendMessage, SendResponse sendResponse) {
-
-                        }
-
-                        @Override
-                        public void onFailure(SendMessage sendMessage, IOException e) {
-
-                        }
+                    Book book = bookRepository.findByBookNameOrAltOrAbbr(request.getBookName()).orElseThrow(() ->{
+                        return new NoSuchElementException("Нету книги с таким названием(");
                     });
+
+                    Verse verse = verseRepository.findByBookIdAndChapterAndVerseNumber(book.getId(), request.getChapter(), request.getVerse()).orElseThrow(() -> {
+                        return new NoSuchElementException("Нету такой главы или параграфа");
+                    });
+
+                    tgBotWrapper.sendMessage(verse.getVerseText(), update.message().chat().id());
                 }
                 catch (NoSuchElementException e){
-
                     log.info(e.getLocalizedMessage());
-
-                    SendMessage sendMessage = new SendMessage(update.message().chat().id(), "Ничего не найденно(, вводите данные в формате Бытие 1:1 ");
-
-                    bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
-                        @Override
-                        public void onResponse(SendMessage sendMessage, SendResponse sendResponse) {
-
-                        }
-
-                        @Override
-                        public void onFailure(SendMessage sendMessage, IOException e) {
-
-                        }
-                    });
-
+                    tgBotWrapper.sendMessage("Ничего не найденно(, вводите данные в формате Бытие 1:1 ", update.message().chat().id());
                 }
                 catch (Exception e){
-
-                    System.out.println(Arrays.toString(e.getStackTrace()));
-                    System.out.println(e.getLocalizedMessage());
-
-                    SendMessage sendMessage = new SendMessage(update.message().chat().id(), "Произошла ошибка");
-
-                    bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
-                        @Override
-                        public void onResponse(SendMessage sendMessage, SendResponse sendResponse) {
-
-                        }
-
-                        @Override
-                        public void onFailure(SendMessage sendMessage, IOException e) {
-
-                        }
-                    });
-
+                    log.info(e.getLocalizedMessage());
+                    tgBotWrapper.sendMessage("Произошла ошибка", update.message().chat().id());
                 }
             }
 
