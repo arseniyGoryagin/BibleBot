@@ -12,8 +12,7 @@ public class Verse {
     @Id
     private Long id;
 
-    @Column(name = "book_id")
-    @ManyToOne
+    @JoinColumn(name = "book_id")
     private Long bookId;
 
     private int chapter;
