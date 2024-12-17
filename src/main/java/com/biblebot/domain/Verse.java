@@ -12,7 +12,6 @@ public class Verse {
     @Id
     private Long id;
 
-    @Column(name = "book_id")
     @JoinColumn(name = "book_id")
     private Long bookId;
 
