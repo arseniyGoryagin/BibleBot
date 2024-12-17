@@ -9,16 +9,19 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 
 @SpringBootApplication
 @RequiredArgsConstructor
+@Slf4j
 public class Main implements CommandLineRunner {
 
 
@@ -47,7 +50,10 @@ public class Main implements CommandLineRunner {
                     String chapter = message[1].split(":")[0];
                     String verseNumber = message[1].split(":")[1];
 
-                    Verse verse = verseRepository.findByBookNameAndChapterAndVerseNumber(bookName, Integer.parseInt(chapter), Integer.parseInt(verseNumber));
+                    Verse verse = verseRepository.findByBookNameAndChapterAndVerseNumber(bookName, Integer.parseInt(chapter), Integer.parseInt(verseNumber))
+                            .orElseThrow(() -> {
+                                return new NoSuchElementException("Searched for : bookName="+bookName+" chapter="+chapter+" verseNumber="+verseNumber);
+                            });
 
                     SendMessage sendMessage = new SendMessage(update.message().chat().id(), verse.getVerseText());
 
@@ -62,6 +68,25 @@ public class Main implements CommandLineRunner {
 
                         }
                     });
+                }
+                catch (NoSuchElementException e){
+
+                    log.info(e.getLocalizedMessage());
+
+                    SendMessage sendMessage = new SendMessage(update.message().chat().id(), "Ничего не найденно(, вводите данные в формате Бытие 1:1 ");
+
+                    bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
+                        @Override
+                        public void onResponse(SendMessage sendMessage, SendResponse sendResponse) {
+
+                        }
+
+                        @Override
+                        public void onFailure(SendMessage sendMessage, IOException e) {
+
+                        }
+                    });
+
                 }
                 catch (Exception e){
 
