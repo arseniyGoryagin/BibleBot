@@ -1,10 +1,7 @@
 package com.biblebot.domain;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -16,6 +13,7 @@ public class Verse {
     private Long id;
 
     @Column(name = "book_id")
+    @ManyToOne
     private Long bookId;
 
     private int chapter;
