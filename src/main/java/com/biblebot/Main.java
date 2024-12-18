@@ -43,8 +43,7 @@ public class Main implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-
-        System.out.println("Started Bot...");
+        log.info("Started Bot...");
 
         TelegramBot bot = new TelegramBot(System.getenv("BOT_TOKEN"));
 
@@ -93,12 +92,14 @@ public class Main implements CommandLineRunner {
                         tgBotWrapper.sendMessage(verse.getVerseText(), update.message().chat().id());
                     }
                 }
+                catch (IllegalArgumentException e){
+                    tgBotWrapper.sendMessage("Не правильный формат данных вводите данные в форме - Бытие 1:1 или Бытие 1 для получение полной главы",update.message().chat().id() );
+                }
                 catch (NoSuchElementException e){
-                    log.info(e.getLocalizedMessage());
                     tgBotWrapper.sendMessage("Ничего не найденно(, вводите данные в формате Бытие 1:1 ", update.message().chat().id());
                 }
                 catch (Exception e){
-                    log.info(e.getLocalizedMessage());
+                    log.error(e.getLocalizedMessage());
                     tgBotWrapper.sendMessage("Произошла ошибка", update.message().chat().id());
                 }
             }
