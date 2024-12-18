@@ -10,5 +10,5 @@ public class Request {
 
     private String bookName;
     private int chapter;
-    private int verse;
+    private Integer verse;
 }
