@@ -1,5 +1,6 @@
 package com.biblebot;
 
+import com.biblebot.constants.Replies;
 import com.biblebot.request.domain.Request;
 import com.biblebot.request.RequestParser;
 import com.biblebot.domain.Book;
@@ -57,8 +58,13 @@ public class Main implements CommandLineRunner {
 
                     if(update.message() == null){
                         continue;
-                    } else if (Objects.equals(update.message().text(), "/start")) {
-                        tgBotWrapper.sendMessage("Добро пожаловать в Бот", update.message().chat().id() );
+                    }
+                    else if (Objects.equals(update.message().text(), "/start")) {
+                        tgBotWrapper.sendMessage(Replies.WELCOME_MESSAGE, update.message().chat().id() );
+                        continue;
+                    }
+                    else if (Objects.equals(update.message().text(), "/start")) {
+                        tgBotWrapper.sendMessage(Replies.ALL_BOOKS, update.message().chat().id() );
                         continue;
                     }
 
@@ -66,13 +72,13 @@ public class Main implements CommandLineRunner {
                     Request request = RequestParser.parseRequest(update.message().text());
 
                     Book book = bookRepository.findByBookNameOrAltOrAbbr(request.getBookName(), request.getBookName(), request.getBookName()).orElseThrow(() ->{
-                        return new NoSuchElementException("Нету книги с таким названием(");
+                        return new NoSuchElementException(Replies.NO_BOOKS_WITH_THAT_NAME);
                     });
 
                     if(request.getVerse() == null){
 
                         List<Verse> verses = verseRepository.findAllByChapterAndBookId(request.getChapter(), book.getId()).orElseThrow(() -> {
-                            return new NoSuchElementException("Нету такой главы");
+                            return new NoSuchElementException(Replies.NO_SUCH_CHAPTER);
                         });
 
                         StringBuilder finalChapter = new StringBuilder();
@@ -86,21 +92,21 @@ public class Main implements CommandLineRunner {
                     }else {
 
                         Verse verse = verseRepository.findByBookIdAndChapterAndVerseNumber(book.getId(), request.getChapter(), request.getVerse()).orElseThrow(() -> {
-                            return new NoSuchElementException("Нету такой главы или параграфа");
+                            return new NoSuchElementException(Replies.NO_SUCH_CHAPTER_OR_VERSE);
                         });
 
                         tgBotWrapper.sendMessage(verse.getVerseText(), update.message().chat().id());
                     }
                 }
                 catch (IllegalArgumentException e){
-                    tgBotWrapper.sendMessage("Не правильный формат данных вводите данные в форме - Бытие 1:1 или Бытие 1 для получение полной главы",update.message().chat().id() );
+                    tgBotWrapper.sendMessage(Replies.INCORRECT_FORMAT,update.message().chat().id() );
                 }
                 catch (NoSuchElementException e){
-                    tgBotWrapper.sendMessage("Ничего не найденно(, вводите данные в формате Бытие 1:1 ", update.message().chat().id());
+                    tgBotWrapper.sendMessage(e.getLocalizedMessage(), update.message().chat().id());
                 }
                 catch (Exception e){
                     log.error(e.getLocalizedMessage());
-                    tgBotWrapper.sendMessage("Произошла ошибка", update.message().chat().id());
+                    tgBotWrapper.sendMessage(Replies.ERROR_OCCURED_TRY_AGAIN, update.message().chat().id());
                 }
             }
 
