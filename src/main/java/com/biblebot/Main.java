@@ -21,6 +21,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -69,11 +70,28 @@ public class Main implements CommandLineRunner {
                         return new NoSuchElementException("Нету книги с таким названием(");
                     });
 
-                    Verse verse = verseRepository.findByBookIdAndChapterAndVerseNumber(book.getId(), request.getChapter(), request.getVerse()).orElseThrow(() -> {
-                        return new NoSuchElementException("Нету такой главы или параграфа");
-                    });
+                    if(request.getVerse() == null){
 
-                    tgBotWrapper.sendMessage(verse.getVerseText(), update.message().chat().id());
+                        List<Verse> verses = verseRepository.findAllByChapterAndBookId(request.getChapter(), book.getId()).orElseThrow(() -> {
+                            return new NoSuchElementException("Нету такой главы");
+                        });
+
+                        StringBuilder finalChapter = new StringBuilder();
+
+                        for(Verse verse : verses){
+                            finalChapter.append(verse.getVerseText());
+                        }
+
+                        tgBotWrapper.sendMessage(finalChapter.toString(), update.message().chat().id());
+
+                    }else {
+
+                        Verse verse = verseRepository.findByBookIdAndChapterAndVerseNumber(book.getId(), request.getChapter(), request.getVerse()).orElseThrow(() -> {
+                            return new NoSuchElementException("Нету такой главы или параграфа");
+                        });
+
+                        tgBotWrapper.sendMessage(verse.getVerseText(), update.message().chat().id());
+                    }
                 }
                 catch (NoSuchElementException e){
                     log.info(e.getLocalizedMessage());

@@ -3,6 +3,7 @@ package com.biblebot.domain;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -10,5 +11,7 @@ import java.util.Optional;
 public interface VerseRepository extends JpaRepository<Verse, Long> {
 
     Optional<Verse> findByBookIdAndChapterAndVerseNumber(Long bookId, int chapter, int verseNumber);
+
+    Optional<List<Verse>> findAllByChapterAndBookId(int chapter, Long bookId);
 
 }
