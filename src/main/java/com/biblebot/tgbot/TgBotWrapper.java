@@ -21,9 +21,9 @@ public class TgBotWrapper {
 
     private final Keyboard keyboard = new ReplyKeyboardMarkup(
             new KeyboardButton[]{
-                    new KeyboardButton("Список  книг")
+                    new KeyboardButton("Список всех книг")
             }
-    );
+    ).resizeKeyboard(true);
 
 
     public void sendMessage(String message, Object chatId){

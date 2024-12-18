@@ -63,7 +63,7 @@ public class Main implements CommandLineRunner {
                         tgBotWrapper.sendMessage(Replies.WELCOME_MESSAGE, update.message().chat().id() );
                         continue;
                     }
-                    else if (Objects.equals(update.message().text(), "/start")) {
+                    else if (Objects.equals(update.message().text(), "/all") || Objects.equals(update.message().text(), "Список всех книг")) {
                         tgBotWrapper.sendMessage(Replies.ALL_BOOKS, update.message().chat().id() );
                         continue;
                     }
