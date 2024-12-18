@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 
 @SpringBootApplication
@@ -53,6 +54,14 @@ public class Main implements CommandLineRunner {
             for(Update update : updates){
 
                 try {
+
+                    if(update.message() == null){
+                        continue;
+                    } else if (Objects.equals(update.message().text(), "/start")) {
+                        tgBotWrapper.sendMessage("Добро пожаловать в Бот", update.message().chat().id() );
+                        continue;
+                    }
+
 
                     Request request = RequestParser.parseRequest(update.message().text());
 
