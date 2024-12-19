@@ -11,6 +11,9 @@ public class Replies {
 
     public static final String ERROR_OCCURED_TRY_AGAIN = "Произошла ошибка попробуйте ёшё раз";
 
+    public static final String SELECT_BOOK = "Выбирете книгу";
+    public static final String SELECT_CHAPTER = "Выбирете главу";
+
     public static final String ALL_BOOKS = "Для выбора книги можно ввести либо полное название, либо указанную аббревиатуру. Учтите, что для некоторых книг с пробелами в названии необходимо вводить только аббревиатуру:\n" +
             "\n" +
             "- Бытие (Быт) — Введите \"Бытие\" или \"Быт\".\n" +
