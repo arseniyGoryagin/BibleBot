@@ -36,82 +36,87 @@ public class Main implements CommandLineRunner {
     private final VerseRepository verseRepository;
     private final BookRepository bookRepository;
 
+    public static final TelegramBot bot = new TelegramBot(System.getenv("BOT_TOKEN"));
+
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
     }
+
 
     @Override
     public void run(String... args) throws Exception {
 
         log.info("Started Bot...");
 
-        TelegramBot bot = new TelegramBot(System.getenv("BOT_TOKEN"));
-
-        TgBotWrapper tgBotWrapper = new TgBotWrapper(bot);
-
         bot.setUpdatesListener(updates ->{
 
             for(Update update : updates){
 
-                try {
-
-                    if(update.message() == null){
-                        continue;
-                    }
-                    else if (Objects.equals(update.message().text(), "/start")) {
-                        tgBotWrapper.sendMessage(Replies.WELCOME_MESSAGE, update.message().chat().id() );
-                        continue;
-                    }
-                    else if (Objects.equals(update.message().text(), "/all") || Objects.equals(update.message().text(), "Список всех книг")) {
-                        tgBotWrapper.sendMessage(Replies.ALL_BOOKS, update.message().chat().id() );
-                        continue;
-                    }
-
-
-                    Request request = RequestParser.parseRequest(update.message().text());
-
-                    Book book = bookRepository.findByBookNameOrAltOrAbbr(request.getBookName(), request.getBookName(), request.getBookName()).orElseThrow(() ->{
-                        return new NoSuchElementException(Replies.NO_BOOKS_WITH_THAT_NAME);
-                    });
-
-                    if(request.getVerse() == null){
-
-                        List<Verse> verses = verseRepository.findAllByChapterAndBookId(request.getChapter(), book.getId()).orElseThrow(() -> {
-                            return new NoSuchElementException(Replies.NO_SUCH_CHAPTER);
-                        });
-
-                        StringBuilder finalChapter = new StringBuilder();
-
-                        for(Verse verse : verses){
-                            finalChapter.append(verse.getVerseText());
-                        }
-
-                        tgBotWrapper.sendMessage(finalChapter.toString(), update.message().chat().id());
-
-                    }else {
-
-                        Verse verse = verseRepository.findByBookIdAndChapterAndVerseNumber(book.getId(), request.getChapter(), request.getVerse()).orElseThrow(() -> {
-                            return new NoSuchElementException(Replies.NO_SUCH_CHAPTER_OR_VERSE);
-                        });
-
-                        tgBotWrapper.sendMessage(verse.getVerseText(), update.message().chat().id());
-                    }
+                if(update.message() != null){
+                    handleMessage(update);
                 }
-                catch (IllegalArgumentException e){
-                    tgBotWrapper.sendMessage(Replies.INCORRECT_FORMAT,update.message().chat().id() );
-                }
-                catch (NoSuchElementException e){
-                    tgBotWrapper.sendMessage(e.getLocalizedMessage(), update.message().chat().id());
-                }
-                catch (Exception e){
-                    log.error(e.getLocalizedMessage());
-                    tgBotWrapper.sendMessage(Replies.ERROR_OCCURED_TRY_AGAIN, update.message().chat().id());
-                }
+
             }
 
 
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
         });
     }
+
+
+    private void  handleMessage(Update update){
+        try {
+
+            if (Objects.equals(update.message().text(), "/start")) {
+                TgBotWrapper.sendMessage(Replies.WELCOME_MESSAGE, update.message().chat().id() );
+                return;
+            }
+            else if (Objects.equals(update.message().text(), "/all") || Objects.equals(update.message().text(), "Список всех книг")) {
+                TgBotWrapper.sendMessage(Replies.ALL_BOOKS, update.message().chat().id() );
+                return;
+            }
+
+
+            Request request = RequestParser.parseRequest(update.message().text());
+
+            Book book = bookRepository.findByBookNameOrAltOrAbbr(request.getBookName(), request.getBookName(), request.getBookName()).orElseThrow(() ->{
+                return new NoSuchElementException(Replies.NO_BOOKS_WITH_THAT_NAME);
+            });
+
+            if(request.getVerse() == null){
+
+                List<Verse> verses = verseRepository.findAllByChapterAndBookId(request.getChapter(), book.getId()).orElseThrow(() -> {
+                    return new NoSuchElementException(Replies.NO_SUCH_CHAPTER);
+                });
+
+                StringBuilder finalChapter = new StringBuilder();
+
+                for(Verse verse : verses){
+                    finalChapter.append(verse.getVerseText());
+                }
+
+                TgBotWrapper.sendMessage(finalChapter.toString(), update.message().chat().id());
+
+            }else {
+
+                Verse verse = verseRepository.findByBookIdAndChapterAndVerseNumber(book.getId(), request.getChapter(), request.getVerse()).orElseThrow(() -> {
+                    return new NoSuchElementException(Replies.NO_SUCH_CHAPTER_OR_VERSE);
+                });
+
+                TgBotWrapper.sendMessage(verse.getVerseText(), update.message().chat().id());
+            }
+        }
+        catch (IllegalArgumentException e){
+            TgBotWrapper.sendMessage(Replies.INCORRECT_FORMAT,update.message().chat().id() );
+        }
+        catch (NoSuchElementException e){
+            TgBotWrapper.sendMessage(e.getLocalizedMessage(), update.message().chat().id());
+        }
+        catch (Exception e){
+            log.error(e.getLocalizedMessage());
+            TgBotWrapper.sendMessage(Replies.ERROR_OCCURED_TRY_AGAIN, update.message().chat().id());
+        }
+    }
+
 }

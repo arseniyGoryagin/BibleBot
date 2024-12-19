@@ -13,20 +13,21 @@ import lombok.Data;
 
 import java.io.IOException;
 
+import static com.biblebot.Main.bot;
+
 @Data
-@AllArgsConstructor
+
 public class TgBotWrapper {
 
-    private final TelegramBot bot;
 
-    private final Keyboard keyboard = new ReplyKeyboardMarkup(
+    public static final Keyboard keyboard = new ReplyKeyboardMarkup(
             new KeyboardButton[]{
                     new KeyboardButton("Список всех книг")
             }
     ).resizeKeyboard(true);
 
 
-    public void sendMessage(String message, Object chatId){
+    public static void sendMessage(String message, Object chatId){
 
         SendMessage sendMessage = new SendMessage(chatId, message).replyMarkup(keyboard);
 
