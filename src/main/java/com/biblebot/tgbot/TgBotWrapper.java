@@ -39,19 +39,15 @@ public class TgBotWrapper {
             sendMessage.replyMarkup(replyKeyboardMarkup);
         }
 
-        log.info("Sending message: {}", message);
-        log.info("Inline keyboard: {}", inlineKeyBoard);
-        log.info("Chat ID: {}", chatId);
 
         bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
             @Override
             public void onResponse(SendMessage sendMessage, SendResponse sendResponse) {
-                log.info("all good");
             }
 
             @Override
             public void onFailure(SendMessage sendMessage, IOException e) {
-                log.error(e.getLocalizedMessage());
+
             }
         });
     }
