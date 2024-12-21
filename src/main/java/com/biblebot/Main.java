@@ -13,6 +13,8 @@ import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.*;
+import com.pengrad.telegrambot.request.AnswerCallbackQuery;
+import com.pengrad.telegrambot.request.EditMessageText;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -119,7 +121,9 @@ public class Main implements CommandLineRunner {
 
                 }
 
-                TgBotWrapper.editMessage(Replies.SELECT_CHAPTER, query.inlineMessageId(), null);
+                bot.execute(new EditMessageText(query.inlineMessageId(), Replies.SELECT_CHAPTER)
+                        .replyMarkup(inlineKeyboardMarkup)
+                );
 
             case 2:
 
@@ -147,7 +151,11 @@ public class Main implements CommandLineRunner {
 
                 inlineVerseKeyboardMarkup.addRow(new InlineKeyboardButton(Replies.ALL_VERSES).callbackData(data[0]+ ":"  + data[1]+ ":"+ "all"));
 
-                TgBotWrapper.editMessage(Replies.SELECT_VERSE, query.inlineMessageId(), null);
+
+                bot.execute(new EditMessageText(query.inlineMessageId(), Replies.SELECT_VERSE)
+                        .replyMarkup(inlineVerseKeyboardMarkup)
+                );
+
 
 
             case 3:
@@ -167,14 +175,23 @@ public class Main implements CommandLineRunner {
                     for(Verse verse : verses){
                         finalChapter.append(verse.getVerseText());
                     }
+
+                    bot.execute(new EditMessageText(query.inlineMessageId(), finalChapter.toString())
+                    );
                 }
 
 
                 Verse verse = verseRepository.findByBookIdAndChapterAndVerseNumber(bookId, chapter, Integer.parseInt(verseChoice))
                         .orElseThrow(() -> {return new NoSuchElementException();});
 
-                TgBotWrapper.editMessage(verse.getVerseText(), null, null);
+
+                bot.execute(new EditMessageText(query.inlineMessageId(), verse.getVerseText())
+                );
+
+
+
         }
+
 
 
     }
