@@ -4,14 +4,20 @@ public class Replies {
 
     public static final String WELCOME_MESSAGE = "Добро пожаловать в Бот";
     public static final String NO_SUCH_CHAPTER = "Нету такой главы";
-    public static final String NO_SUCH_CHAPTER_OR_VERSE = "Нету такой главы или параграфа";
+    public static final String NO_SUCH_CHAPTER_OR_VERSE = "Нету такой главы или стиха";
 
-    public static final String NO_BOOKS_WITH_THAT_NAME = "Нету книги с таким названием(, отпарвте /all что бы увидеть весь сптсок книг";
-    public static final String INCORRECT_FORMAT = "Не правильный формат данных вводите данные в форме - Бытие 1:1 или Бытие 1 для получение полной главы, напишити /all что бы увидеть ве книги";
+    public static final String NO_BOOKS_WITH_THAT_NAME = "Нету книги с таким названием(, отправте /all что бы увидеть список всех книг";
+    public static final String INCORRECT_FORMAT = "Не правильный формат данных вводите данные в форме - Бытие 1:1 или Бытие 1 для получение всей главы, напишити /all что бы увидеть сптсок всех все книги";
 
     public static final String ERROR_OCCURED_TRY_AGAIN = "Произошла ошибка попробуйте ёшё раз";
 
-    public static final String ALL_BOOKS = "Вот обновленный список книг с их аббревиатурами. Для выбора книги можно ввести либо полное название, либо указанную аббревиатуру. Учтите, что для некоторых книг с пробелами в названии необходимо вводить только аббревиатуру:\n" +
+    public static final String ALL_VERSES = "Все стихи";
+
+    public static final String SELECT_BOOK = "Выбирете книгу";
+    public static final String SELECT_CHAPTER = "Выбирете главу";
+    public static final String SELECT_VERSE = "Выбирете стих";
+
+    public static final String ALL_BOOKS = "Для выбора книги можно ввести либо полное название, либо указанную аббревиатуру. Учтите, что для некоторых книг с пробелами в названии необходимо вводить только аббревиатуру:\n" +
             "\n" +
             "- Бытие (Быт) — Введите \"Бытие\" или \"Быт\".\n" +
             "- Исход (Исх) — Введите \"Исход\" или \"Исх\".\n" +
