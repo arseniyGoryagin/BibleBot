@@ -1,13 +1,14 @@
 package com.biblebot;
 
+import com.biblebot.callbackdata.CallBackData;
 import com.biblebot.constants.Replies;
+import com.biblebot.domain.*;
+import com.biblebot.page.PageService;
 import com.biblebot.request.domain.Request;
 import com.biblebot.request.RequestParser;
-import com.biblebot.domain.Book;
-import com.biblebot.domain.BookRepository;
-import com.biblebot.domain.Verse;
-import com.biblebot.domain.VerseRepository;
+import com.biblebot.page.Page;
 import com.biblebot.tgbot.TgBotWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.CallbackQuery;
@@ -31,6 +32,7 @@ public class Main implements CommandLineRunner {
 
     private final VerseRepository verseRepository;
     private final BookRepository bookRepository;
+    private final PageService pageService;
 
     public static final TelegramBot bot = new TelegramBot(System.getenv("BOT_TOKEN"));
 
@@ -84,163 +86,43 @@ public class Main implements CommandLineRunner {
     }
 
 
-    private void handleCallBackQuery(Update update){
 
+
+
+
+    private void handleCallBackQuery(Update update) throws JsonProcessingException {
 
         CallbackQuery query = update.callbackQuery();
+        CallBackData callBackData = CallBackData.fromJson(query.data());
 
+        Page page = switch (callBackData.getPage()){
+            case BOOK -> {
+                yield pageService.renderBookPage();
+            }
+            case CHAPTER -> {
+                yield  pageService.renderChaptersPage(callBackData.getData());
+            }
+            case VERSE -> {
+                yield  pageService.renderVersePage(callBackData.getData());
+            }
+            case TEXT-> {
+                yield pageService.renderTextPage(callBackData.getData());
+            }
+        };
 
-        String []data = query.data().split(":");
-
-        switch (data.length){
-
-            case 1:
-
-                long totalChapters  = verseRepository.countDistinctChapterByBookId(Long.parseLong(data[0]));
-
-                log.info("Total chapter " + totalChapters);
-
-                InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-                InlineKeyboardButton[] chaptersButtonsRow = new InlineKeyboardButton[4];
-
-                int rowNum =0;
-                for (int chapterNum= 1; chapterNum != totalChapters; chapterNum++){
-
-                    chaptersButtonsRow[rowNum] = new InlineKeyboardButton("" +chapterNum).callbackData(data[0] + ":" + chapterNum);
-
-                    rowNum++;
-
-                    if (rowNum == 4) {
-                        inlineKeyboardMarkup.addRow(chaptersButtonsRow);
-                        chaptersButtonsRow = new InlineKeyboardButton[4];
-                        rowNum = 0;
-                    }
-
-
-                }
-
-                log.info(String.valueOf(inlineKeyboardMarkup));
-                log.info("inline message id " + query.inlineMessageId());
-
-                bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId() ,Replies.SELECT_CHAPTER)
-                        .replyMarkup(inlineKeyboardMarkup)
-                );
-
-                break;
-
-            case 2:
-
-                long verseCount = verseRepository.countByBookIdAndChapter(Long.parseLong(data[0]), Integer.parseInt(data[1]));
-
-                InlineKeyboardMarkup inlineVerseKeyboardMarkup = new InlineKeyboardMarkup();
-                InlineKeyboardButton[] versesButtonsRow = new InlineKeyboardButton[4];
-
-
-                int rowVerseNum = 0;
-                for (int verseNum= 1; verseNum != verseCount; verseNum++){
-
-                    versesButtonsRow[rowVerseNum] = new InlineKeyboardButton("" +verseNum).callbackData(data[0]+ ":"  + data[1]+ ":"+ verseNum);
-
-                    rowVerseNum++;
-
-                    if (rowVerseNum == 4) {
-                        inlineVerseKeyboardMarkup.addRow(versesButtonsRow);
-                        versesButtonsRow = new InlineKeyboardButton[4];
-                        rowVerseNum = 0;
-                    }
-
-
-                }
-
-                inlineVerseKeyboardMarkup.addRow(new InlineKeyboardButton(Replies.ALL_VERSES).callbackData(data[0]+ ":"  + data[1]+ ":"+ "all"));
-
-
-                bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId() , Replies.SELECT_VERSE)
-                        .replyMarkup(inlineVerseKeyboardMarkup)
-                );
-
-                break;
-
-
-
-            case 3:
-
-                long bookId = Long.parseLong(data[0]);
-                int chapter = Integer.parseInt(data[1]);
-                String verseChoice = data[2];
-
-                if(Objects.equals(verseChoice, "all")){
-
-                    List<Verse> verses = verseRepository.findAllByChapterAndBookId(chapter, bookId).orElseThrow(() -> {
-                        return new NoSuchElementException(Replies.NO_SUCH_CHAPTER);
-                    });
-
-                    StringBuilder finalChapter = new StringBuilder();
-
-                    for(Verse verse : verses){
-                        finalChapter.append(verse.getVerseText());
-                    }
-
-                    bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId(), finalChapter.toString())
-                    );
-                }
-
-
-                Verse verse = verseRepository.findByBookIdAndChapterAndVerseNumber(bookId, chapter, Integer.parseInt(verseChoice))
-                        .orElseThrow(() -> {return new NoSuchElementException(Replies.NO_SUCH_CHAPTER_OR_VERSE);});
-
-
-                bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId(), verse.getVerseText())
-                        .replyMarkup(new InlineKeyboardMarkup())
-                );
-
-
-                break;
-
-
-
-        }
-
+        bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId() ,Replies.SELECT_BOOK)
+                .replyMarkup(page.getInlineKeyboardMarkup())
+        );
 
 
     }
 
 
-    private void  handleMessage(Update update){
+    private void  handleMessage(Update update) throws JsonProcessingException {
 
-
-            if (Objects.equals(update.message().text(), "/start")) {
-                TgBotWrapper.sendMessage(Replies.WELCOME_MESSAGE, update.message().chat().id(), null, replyKeyboardMarkup);
-                return;
-            }
-            else if (Objects.equals(update.message().text(), "/all") || Objects.equals(update.message().text(), "Список всех книг")) {
-
-                List<Book> books = bookRepository.findAll();
-
-                InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-                InlineKeyboardButton[] bookButtonsRow = new InlineKeyboardButton[4];
-
-                int rowNum = 0;
-                for (int bookNum = 0; bookNum < books.size(); bookNum++){
-
-                    bookButtonsRow[rowNum] = new InlineKeyboardButton(books.get(bookNum).getBookName()).callbackData(books.get(bookNum).getId().toString());
-
-                    rowNum++;
-
-                    if (rowNum == 4) {
-                        inlineKeyboardMarkup.addRow(bookButtonsRow);
-                        bookButtonsRow = new InlineKeyboardButton[4];
-                        rowNum = 0;
-                    }
-                }
-
-                if(rowNum > 0){
-                    inlineKeyboardMarkup.addRow(Arrays.copyOf(bookButtonsRow, rowNum));
-                }
-
-                log.info(String.valueOf(inlineKeyboardMarkup));
-
-                TgBotWrapper.sendMessage(Replies.SELECT_BOOK, update.message().chat().id(), inlineKeyboardMarkup, replyKeyboardMarkup);
+            if (Objects.equals(update.message().text(), "/start") || Objects.equals(update.message().text(), "/all") || Objects.equals(update.message().text(), "Список всех книг")) {
+                Page bookPage = pageService.renderBookPage();
+                TgBotWrapper.sendMessage(bookPage.getText(), update.message().chat().id(), bookPage.getInlineKeyboardMarkup(), null);
                 return;
             }
 

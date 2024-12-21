@@ -13,6 +13,8 @@ public class Replies {
 
     public static final String ALL_VERSES = "Все стихи";
 
+    public static final String GO_BACK = "Обратно";
+
     public static final String SELECT_BOOK = "Выбирете книгу";
     public static final String SELECT_CHAPTER = "Выбирете главу";
     public static final String SELECT_VERSE = "Выбирете стих";
