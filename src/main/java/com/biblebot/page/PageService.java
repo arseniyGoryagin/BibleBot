@@ -35,6 +35,10 @@ public class PageService {
         int chapter = Integer.parseInt(dataSplit[1]);
         String verseChoice = dataSplit[2];
 
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        CallBackData callBackDataBack = new CallBackData(Pages.VERSE,dataSplit[0] + dataSplit[1]);
+        inlineKeyboardMarkup.addRow(new InlineKeyboardButton(Replies.GO_BACK).callbackData(CallBackData.toJson(callBackDataBack)));
+
         if(Objects.equals(verseChoice, "all")){
 
             List<Verse> verses = verseRepository.findAllByChapterAndBookId(chapter, bookId).orElseThrow(() -> {
@@ -47,18 +51,13 @@ public class PageService {
                 finalChapter.append(verse.getVerseText());
             }
 
-            return new Page(finalChapter.toString(), new InlineKeyboardMarkup());
+            return new Page(finalChapter.toString(), inlineKeyboardMarkup);
 
         }
 
 
         Verse verse = verseRepository.findByBookIdAndChapterAndVerseNumber(bookId, chapter, Integer.parseInt(verseChoice))
                 .orElseThrow(() -> {return new NoSuchElementException(Replies.NO_SUCH_CHAPTER_OR_VERSE);});
-
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        CallBackData callBackDataBack = new CallBackData(Pages.VERSE,dataSplit[0] + dataSplit[1]);
-        inlineKeyboardMarkup.addRow(new InlineKeyboardButton(Replies.GO_BACK).callbackData(CallBackData.toJson(callBackDataBack)));
-
 
         return new Page(verse.getVerseText(), inlineKeyboardMarkup);
 
