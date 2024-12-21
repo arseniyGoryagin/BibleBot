@@ -12,6 +12,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 
@@ -21,6 +22,7 @@ import static com.biblebot.Main.bot;
 @Data
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TgBotWrapper {
 
 
@@ -39,15 +41,19 @@ public class TgBotWrapper {
             sendMessage.replyMarkup(replyKeyboardMarkup);
         }
 
+        log.info("Sending message: {}", message);
+        log.info("Inline keyboard: {}", inlineKeyBoard);
+        log.info("Chat ID: {}", chatId);
+
         bot.execute(sendMessage, new Callback<SendMessage, SendResponse>() {
             @Override
             public void onResponse(SendMessage sendMessage, SendResponse sendResponse) {
-
+                log.info("all good");
             }
 
             @Override
             public void onFailure(SendMessage sendMessage, IOException e) {
-
+                log.error(e.getLocalizedMessage());
             }
         });
     }
