@@ -17,6 +17,8 @@ public interface VerseRepository extends JpaRepository<Verse, Long> {
     Optional<List<Verse>> findAllByChapterAndBookId(int chapter, Long bookId);
 
     @Query("SELECT COUNT(DISTINCT v.chapter) FROM Verse v WHERE v.bookId = :bookId")
-    long countDistinctChapterByBookId(@Param("bookId") Long bookId);
+    long countDistinctChapterByBookId(@Param("bookId") long bookId);
+
+    long countByBookIdAndChapter(long bookId, int chapter);
 
 }
