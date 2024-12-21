@@ -122,7 +122,7 @@ public class Main implements CommandLineRunner {
                 log.info(String.valueOf(inlineKeyboardMarkup));
                 log.info("inline message id " + query.inlineMessageId());
 
-                bot.execute(new EditMessageText(query.inlineMessageId(), Replies.SELECT_CHAPTER)
+                bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId() ,Replies.SELECT_CHAPTER)
                         .replyMarkup(inlineKeyboardMarkup)
                 );
 
@@ -153,7 +153,7 @@ public class Main implements CommandLineRunner {
                 inlineVerseKeyboardMarkup.addRow(new InlineKeyboardButton(Replies.ALL_VERSES).callbackData(data[0]+ ":"  + data[1]+ ":"+ "all"));
 
 
-                bot.execute(new EditMessageText(query.inlineMessageId(), Replies.SELECT_VERSE)
+                bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId() , Replies.SELECT_VERSE)
                         .replyMarkup(inlineVerseKeyboardMarkup)
                 );
 
@@ -177,7 +177,7 @@ public class Main implements CommandLineRunner {
                         finalChapter.append(verse.getVerseText());
                     }
 
-                    bot.execute(new EditMessageText(query.inlineMessageId(), finalChapter.toString())
+                    bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId(), finalChapter.toString())
                     );
                 }
 
