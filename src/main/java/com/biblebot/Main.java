@@ -126,6 +126,8 @@ public class Main implements CommandLineRunner {
                         .replyMarkup(inlineKeyboardMarkup)
                 );
 
+                break;
+
             case 2:
 
                 long verseCount = verseRepository.countByBookIdAndChapter(Long.parseLong(data[0]), Integer.parseInt(data[1]));
@@ -157,6 +159,8 @@ public class Main implements CommandLineRunner {
                         .replyMarkup(inlineVerseKeyboardMarkup)
                 );
 
+                break;
+
 
 
             case 3:
@@ -187,7 +191,11 @@ public class Main implements CommandLineRunner {
 
 
                 bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId(), verse.getVerseText())
+                        .replyMarkup(new InlineKeyboardMarkup())
                 );
+
+
+                break;
 
 
 
