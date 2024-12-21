@@ -36,7 +36,7 @@ public class PageService {
         String verseChoice = dataSplit[2];
 
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        CallBackData callBackDataBack = new CallBackData(Pages.VERSE,dataSplit[0] + dataSplit[1]);
+        CallBackData callBackDataBack = new CallBackData(Pages.VERSE,dataSplit[0] + ":" + dataSplit[1]);
         inlineKeyboardMarkup.addRow(new InlineKeyboardButton(Replies.GO_BACK).callbackData(CallBackData.toJson(callBackDataBack)));
 
         if(Objects.equals(verseChoice, "all")){
