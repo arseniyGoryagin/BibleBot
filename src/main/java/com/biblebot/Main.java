@@ -123,7 +123,7 @@ public class Main implements CommandLineRunner {
 
             case 2:
 
-                long verseCount = verseRepository.countBookIdAndChapter(Long.parseLong(data[0]), Long.parseLong(data[1]));
+                long verseCount = verseRepository.countByBookIdAndChapter(Long.parseLong(data[0]), Long.parseLong(data[1]));
 
                 InlineKeyboardMarkup inlineVerseKeyboardMarkup = new InlineKeyboardMarkup();
                 InlineKeyboardButton[] versesButtonsRow = new InlineKeyboardButton[4];
