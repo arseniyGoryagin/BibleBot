@@ -186,7 +186,7 @@ public class Main implements CommandLineRunner {
                         .orElseThrow(() -> {return new NoSuchElementException(Replies.NO_SUCH_CHAPTER_OR_VERSE);});
 
 
-                bot.execute(new EditMessageText(query.inlineMessageId(), verse.getVerseText())
+                bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId(), verse.getVerseText())
                 );
 
 
