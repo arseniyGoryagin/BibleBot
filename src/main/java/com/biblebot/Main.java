@@ -69,6 +69,7 @@ public class Main implements CommandLineRunner {
                 }
                 catch (Exception e){
                     log.error(e.getLocalizedMessage());
+                    e.printStackTrace();
                     if (update.message() != null) {
                         TgBotWrapper.sendMessage(e.getLocalizedMessage(), update.message().chat().id(), null, replyKeyboardMarkup);
                     } else if (update.callbackQuery() != null) {
