@@ -20,8 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.io.IOException;
 import java.util.*;
 
 
@@ -69,17 +67,14 @@ public class Main implements CommandLineRunner {
 
 
                 }
-                catch (IllegalArgumentException e){
-                TgBotWrapper.sendMessage(Replies.INCORRECT_FORMAT,update.message().chat().id(), null, replyKeyboardMarkup );
-                }
-                catch (NoSuchElementException e){
-                TgBotWrapper.sendMessage(e.getLocalizedMessage(), update.message().chat().id(), null, replyKeyboardMarkup);
-                }
                 catch (Exception e){
-                log.error(e.getLocalizedMessage());
-                TgBotWrapper.sendMessage(Replies.ERROR_OCCURED_TRY_AGAIN, update.message().chat().id(), null, replyKeyboardMarkup);
+                    log.error(e.getLocalizedMessage());
+                    if (update.message() != null) {
+                        TgBotWrapper.sendMessage(e.getLocalizedMessage(), update.message().chat().id(), null, replyKeyboardMarkup);
+                    } else if (update.callbackQuery() != null) {
+                        bot.execute(new AnswerCallbackQuery(update.callbackQuery().id()).text(e.getLocalizedMessage()));
+                    };
                 }
-
             }
 
 
@@ -182,7 +177,7 @@ public class Main implements CommandLineRunner {
 
 
                 Verse verse = verseRepository.findByBookIdAndChapterAndVerseNumber(bookId, chapter, Integer.parseInt(verseChoice))
-                        .orElseThrow(() -> {return new NoSuchElementException();});
+                        .orElseThrow(() -> {return new NoSuchElementException(Replies.NO_SUCH_CHAPTER_OR_VERSE);});
 
 
                 bot.execute(new EditMessageText(query.inlineMessageId(), verse.getVerseText())
