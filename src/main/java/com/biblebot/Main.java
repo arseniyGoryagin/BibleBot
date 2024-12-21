@@ -56,8 +56,26 @@ public class Main implements CommandLineRunner {
 
             for(Update update : updates){
 
+
+                try{
+
                 if(update.message() != null){
                     handleMessage(update);
+                }else if(update.callbackQuery() != null){
+                    handleCallBackQuery(update);
+                }
+
+
+                }
+                catch (IllegalArgumentException e){
+                TgBotWrapper.sendMessage(Replies.INCORRECT_FORMAT,update.message().chat().id(), null, replyKeyboardMarkup );
+                }
+                catch (NoSuchElementException e){
+                TgBotWrapper.sendMessage(e.getLocalizedMessage(), update.message().chat().id(), null, replyKeyboardMarkup);
+                }
+                catch (Exception e){
+                log.error(e.getLocalizedMessage());
+                TgBotWrapper.sendMessage(Replies.ERROR_OCCURED_TRY_AGAIN, update.message().chat().id(), null, replyKeyboardMarkup);
                 }
 
             }
@@ -79,6 +97,8 @@ public class Main implements CommandLineRunner {
         switch (data.length){
 
             case 1:
+
+
                 long totalChapters  = verseRepository.countDistinctChapterByBookId(Long.parseLong(data[0]));
 
                 InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
@@ -86,7 +106,7 @@ public class Main implements CommandLineRunner {
 
                 for (int chapterNum= 0; chapterNum < totalChapters ; chapterNum++){
 
-                    chaptersButtonsRow[chapterNum] = new InlineKeyboardButton("" +chapterNum).callbackData(Arrays.toString(data) + ":" + chapterNum);
+                    chaptersButtonsRow[chapterNum] = new InlineKeyboardButton("" +chapterNum).callbackData(data[0] + ":" + chapterNum);
 
                     chapterNum++;
 
@@ -101,7 +121,57 @@ public class Main implements CommandLineRunner {
 
                 TgBotWrapper.editMessage(Replies.SELECT_CHAPTER, query.inlineMessageId(), null);
 
+            case 2:
 
+                long verseCount = verseRepository.countBookIdAndChapter(Long.parseLong(data[0]), Long.parseLong(data[1]));
+
+                InlineKeyboardMarkup inlineVerseKeyboardMarkup = new InlineKeyboardMarkup();
+                InlineKeyboardButton[] versesButtonsRow = new InlineKeyboardButton[4];
+
+                for (int verseNum= 0; verseNum < verseCount ; verseNum++){
+
+                    versesButtonsRow[verseNum] = new InlineKeyboardButton("" +verseNum).callbackData(data[0]+ ":"  + data[1]+ ":"+ verseNum);
+
+                    verseNum++;
+
+                    if (verseNum % 4 == 0) {
+                        inlineVerseKeyboardMarkup.addRow(versesButtonsRow);
+                        versesButtonsRow = new InlineKeyboardButton[4];
+                        verseNum = 0;
+                    }
+
+
+                }
+
+                inlineVerseKeyboardMarkup.addRow(new InlineKeyboardButton(Replies.ALL_VERSES).callbackData(data[0]+ ":"  + data[1]+ ":"+ "all"));
+
+                TgBotWrapper.editMessage(Replies.SELECT_VERSE, query.inlineMessageId(), null);
+
+
+            case 3:
+
+                long bookId = Long.parseLong(data[0]);
+                int chapter = Integer.parseInt(data[1]);
+                String verseChoice = data[2];
+
+                if(Objects.equals(verseChoice, "all")){
+
+                    List<Verse> verses = verseRepository.findAllByChapterAndBookId(chapter, bookId).orElseThrow(() -> {
+                        return new NoSuchElementException(Replies.NO_SUCH_CHAPTER);
+                    });
+
+                    StringBuilder finalChapter = new StringBuilder();
+
+                    for(Verse verse : verses){
+                        finalChapter.append(verse.getVerseText());
+                    }
+                }
+
+
+                Verse verse = verseRepository.findByBookIdAndChapterAndVerseNumber(bookId, chapter, Integer.parseInt(verseChoice))
+                        .orElseThrow(() -> {return new NoSuchElementException();});
+
+                TgBotWrapper.editMessage(verse.getVerseText(), null, null);
         }
 
 
@@ -109,7 +179,7 @@ public class Main implements CommandLineRunner {
 
 
     private void  handleMessage(Update update){
-        try {
+
 
             if (Objects.equals(update.message().text(), "/start")) {
                 TgBotWrapper.sendMessage(Replies.WELCOME_MESSAGE, update.message().chat().id(), null, replyKeyboardMarkup);
@@ -168,17 +238,6 @@ public class Main implements CommandLineRunner {
 
                 TgBotWrapper.sendMessage(verse.getVerseText(), update.message().chat().id(), null, replyKeyboardMarkup);
             }
-        }
-        catch (IllegalArgumentException e){
-            TgBotWrapper.sendMessage(Replies.INCORRECT_FORMAT,update.message().chat().id(), null, replyKeyboardMarkup );
-        }
-        catch (NoSuchElementException e){
-            TgBotWrapper.sendMessage(e.getLocalizedMessage(), update.message().chat().id(), null, replyKeyboardMarkup);
-        }
-        catch (Exception e){
-            log.error(e.getLocalizedMessage());
-            TgBotWrapper.sendMessage(Replies.ERROR_OCCURED_TRY_AGAIN, update.message().chat().id(), null, replyKeyboardMarkup);
-        }
     }
 
 }
