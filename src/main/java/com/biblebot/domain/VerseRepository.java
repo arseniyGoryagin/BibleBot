@@ -16,6 +16,6 @@ public interface VerseRepository extends JpaRepository<Verse, Long> {
 
     long countDistinctChapterByBookId(Long bookId);
 
-    long countByBookIdAndChapter(Long bookId, Long chapter);
+    long countByBookIdAndChapter(Long bookId, int chapter);
 
 }
