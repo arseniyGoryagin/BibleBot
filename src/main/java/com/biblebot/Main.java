@@ -196,12 +196,14 @@ public class Main implements CommandLineRunner {
 
                     bookButtonsRow[rowNum] = new InlineKeyboardButton(books.get(rowNum).getBookName()).callbackData(books.get(rowNum).getId().toString());
 
-                    rowNum++;
+
 
                     if (rowNum  % 4 == 0) {
                         inlineKeyboardMarkup.addRow(bookButtonsRow);
                         bookButtonsRow = new InlineKeyboardButton[4];
                         rowNum = 0;
+                    }else{
+                        rowNum++;
                     }
                 }
 
