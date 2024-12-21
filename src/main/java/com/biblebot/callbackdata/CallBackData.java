@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CallBackData {
 
+
     private Pages page;
 
     private String data;
