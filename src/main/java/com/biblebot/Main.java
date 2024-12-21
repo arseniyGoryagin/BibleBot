@@ -98,7 +98,6 @@ public class Main implements CommandLineRunner {
 
             case 1:
 
-
                 long totalChapters  = verseRepository.countDistinctChapterByBookId(Long.parseLong(data[0]));
 
                 InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
@@ -109,12 +108,12 @@ public class Main implements CommandLineRunner {
 
                     chaptersButtonsRow[rowNum] = new InlineKeyboardButton("" +chapterNum).callbackData(data[0] + ":" + chapterNum);
 
-                    if ((rowNum + 1) % 4 == 0) {
+                    rowNum++;
+
+                    if (rowNum == 4) {
                         inlineKeyboardMarkup.addRow(chaptersButtonsRow);
                         chaptersButtonsRow = new InlineKeyboardButton[4];
                         chapterNum = 0;
-                    }else{
-                        rowNum++;
                     }
 
 
@@ -135,12 +134,12 @@ public class Main implements CommandLineRunner {
 
                     versesButtonsRow[rowVerseNum] = new InlineKeyboardButton("" +verseNum).callbackData(data[0]+ ":"  + data[1]+ ":"+ verseNum);
 
-                    if ((rowVerseNum + 1) % 4 == 0) {
+                    rowVerseNum++;
+
+                    if (rowVerseNum == 4) {
                         inlineVerseKeyboardMarkup.addRow(versesButtonsRow);
                         versesButtonsRow = new InlineKeyboardButton[4];
                         rowVerseNum = 0;
-                    }else{
-                        rowVerseNum++;
                     }
 
 
@@ -198,16 +197,22 @@ public class Main implements CommandLineRunner {
                 int rowNum = 0;
                 for (int bookNum = 0; bookNum < books.size(); bookNum++){
 
-                    bookButtonsRow[rowNum] = new InlineKeyboardButton(books.get(rowNum).getBookName()).callbackData(books.get(rowNum).getId().toString());
+                    bookButtonsRow[rowNum] = new InlineKeyboardButton(books.get(bookNum).getBookName()).callbackData(books.get(bookNum).getId().toString());
 
-                    if ((rowNum + 1)  % 4 == 0) {
+                    rowNum++;
+
+                    if (rowNum == 4) {
                         inlineKeyboardMarkup.addRow(bookButtonsRow);
                         bookButtonsRow = new InlineKeyboardButton[4];
                         rowNum = 0;
-                    }else{
-                        rowNum++;
                     }
                 }
+
+                if(rowNum > 0){
+                    inlineKeyboardMarkup.addRow(Arrays.copyOf(bookButtonsRow, rowNum));
+                }
+
+                log.info(String.valueOf(inlineKeyboardMarkup));
 
                 TgBotWrapper.sendMessage(Replies.SELECT_BOOK, update.message().chat().id(), inlineKeyboardMarkup, replyKeyboardMarkup);
                 return;
