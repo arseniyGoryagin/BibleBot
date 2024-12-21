@@ -104,16 +104,16 @@ public class Main implements CommandLineRunner {
                 InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
                 InlineKeyboardButton[] chaptersButtonsRow = new InlineKeyboardButton[4];
 
-                for (int chapterNum= 0; chapterNum < totalChapters ; chapterNum++){
+                for (int chapterNum= 0; chapterNum < totalChapters;){
 
                     chaptersButtonsRow[chapterNum] = new InlineKeyboardButton("" +chapterNum).callbackData(data[0] + ":" + chapterNum);
 
-                    chapterNum++;
-
-                    if (chapterNum % 4 == 0) {
+                    if ((chapterNum + 1) % 4 == 0) {
                         inlineKeyboardMarkup.addRow(chaptersButtonsRow);
                         chaptersButtonsRow = new InlineKeyboardButton[4];
                         chapterNum = 0;
+                    }else{
+                        chapterNum++;
                     }
 
 
@@ -128,16 +128,16 @@ public class Main implements CommandLineRunner {
                 InlineKeyboardMarkup inlineVerseKeyboardMarkup = new InlineKeyboardMarkup();
                 InlineKeyboardButton[] versesButtonsRow = new InlineKeyboardButton[4];
 
-                for (int verseNum= 0; verseNum < verseCount ; verseNum++){
+                for (int verseNum= 0; verseNum < verseCount;){
 
                     versesButtonsRow[verseNum] = new InlineKeyboardButton("" +verseNum).callbackData(data[0]+ ":"  + data[1]+ ":"+ verseNum);
 
-                    verseNum++;
-
-                    if (verseNum % 4 == 0) {
+                    if ((verseNum + 1) % 4 == 0) {
                         inlineVerseKeyboardMarkup.addRow(versesButtonsRow);
                         versesButtonsRow = new InlineKeyboardButton[4];
                         verseNum = 0;
+                    }else{
+                        verseNum++;
                     }
 
 
@@ -192,13 +192,11 @@ public class Main implements CommandLineRunner {
                 InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
                 InlineKeyboardButton[] bookButtonsRow = new InlineKeyboardButton[4];
 
-                for (int rowNum = 0; rowNum < books.size() ; rowNum++){
+                for (int rowNum = 0; rowNum < books.size();){
 
                     bookButtonsRow[rowNum] = new InlineKeyboardButton(books.get(rowNum).getBookName()).callbackData(books.get(rowNum).getId().toString());
 
-
-
-                    if (rowNum  % 4 == 0) {
+                    if ((rowNum + 1)  % 4 == 0) {
                         inlineKeyboardMarkup.addRow(bookButtonsRow);
                         bookButtonsRow = new InlineKeyboardButton[4];
                         rowNum = 0;
