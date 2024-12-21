@@ -110,7 +110,7 @@ public class Main implements CommandLineRunner {
                     if (rowNum == 4) {
                         inlineKeyboardMarkup.addRow(chaptersButtonsRow);
                         chaptersButtonsRow = new InlineKeyboardButton[4];
-                        chapterNum = 0;
+                        rowNum = 0;
                     }
 
 
