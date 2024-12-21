@@ -35,9 +35,7 @@ public class TgBotWrapper {
 
         if(inlineKeyBoard != null){
             sendMessage.replyMarkup(inlineKeyBoard);
-        }
-
-        if(replyKeyboardMarkup != null){
+        }else if(replyKeyboardMarkup != null){
             sendMessage.replyMarkup(replyKeyboardMarkup);
         }
 
