@@ -1,6 +1,8 @@
 package com.biblebot.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,8 +16,7 @@ public interface VerseRepository extends JpaRepository<Verse, Long> {
 
     Optional<List<Verse>> findAllByChapterAndBookId(int chapter, Long bookId);
 
-    long countDistinctChapterByBookId(Long bookId);
-
-    long countByBookIdAndChapter(Long bookId, int chapter);
+    @Query("SELECT COUNT(DISTINCT v.chapter) FROM Verse v WHERE v.bookId = :bookId")
+    long countDistinctChapterByBookId(@Param("bookId") Long bookId);
 
 }
