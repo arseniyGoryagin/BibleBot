@@ -78,7 +78,7 @@ public class PageService {
         InlineKeyboardButton[] chaptersButtonsRow = new InlineKeyboardButton[4];
 
         int rowNum =0;
-        for (int chapterNum= 1; chapterNum != totalChapters; chapterNum++){
+        for (int chapterNum= 1; chapterNum <= totalChapters; chapterNum++){
 
 
             CallBackData callBackData = new CallBackData(Pages.VERSE, data + ":" + chapterNum);
@@ -95,6 +95,11 @@ public class PageService {
 
 
         }
+
+        if(rowNum > 0){
+            inlineKeyboardMarkup.addRow(Arrays.copyOf(chaptersButtonsRow, rowNum));
+        }
+
 
         log.info(String.valueOf(inlineKeyboardMarkup));
 
@@ -118,7 +123,7 @@ public class PageService {
 
 
         int rowVerseNum = 0;
-        for (int verseNum= 1; verseNum != verseCount; verseNum++){
+        for (int verseNum= 1; verseNum <= verseCount; verseNum++){
 
             CallBackData callBackData = new CallBackData(Pages.TEXT,data + ":" + verseNum );
 
@@ -134,6 +139,11 @@ public class PageService {
 
 
         }
+
+        if(rowVerseNum > 0){
+            inlineVerseKeyboardMarkup.addRow(Arrays.copyOf(versesButtonsRow, rowVerseNum));
+        }
+
 
 
         CallBackData callBackDataAll = new CallBackData(Pages.TEXT,data + ":" + "all" );
