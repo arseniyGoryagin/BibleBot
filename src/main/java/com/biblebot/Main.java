@@ -104,7 +104,7 @@ public class Main implements CommandLineRunner {
                 InlineKeyboardButton[] chaptersButtonsRow = new InlineKeyboardButton[4];
 
                 int rowNum =0;
-                for (int chapterNum= 0; chapterNum < totalChapters; chapterNum++){
+                for (int chapterNum= 1; chapterNum != totalChapters; chapterNum++){
 
                     chaptersButtonsRow[rowNum] = new InlineKeyboardButton("" +chapterNum).callbackData(data[0] + ":" + chapterNum);
 
@@ -128,14 +128,14 @@ public class Main implements CommandLineRunner {
 
             case 2:
 
-                long verseCount = verseRepository.countByBookIdAndChapter(Long.parseLong(data[0]), Long.parseLong(data[1]));
+                long verseCount = verseRepository.countByBookIdAndChapter(Long.parseLong(data[0]), Integer.parseInt(data[1]));
 
                 InlineKeyboardMarkup inlineVerseKeyboardMarkup = new InlineKeyboardMarkup();
                 InlineKeyboardButton[] versesButtonsRow = new InlineKeyboardButton[4];
 
 
                 int rowVerseNum = 0;
-                for (int verseNum= 0; verseNum < verseCount; verseNum++){
+                for (int verseNum= 1; verseNum != verseCount; verseNum++){
 
                     versesButtonsRow[rowVerseNum] = new InlineKeyboardButton("" +verseNum).callbackData(data[0]+ ":"  + data[1]+ ":"+ verseNum);
 
@@ -186,7 +186,7 @@ public class Main implements CommandLineRunner {
                         .orElseThrow(() -> {return new NoSuchElementException(Replies.NO_SUCH_CHAPTER_OR_VERSE);});
 
 
-                bot.execute(new EditMessageText(query.inlineMessageId(), verse.getVerseText())
+                bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId(), verse.getVerseText())
                 );
 
 
