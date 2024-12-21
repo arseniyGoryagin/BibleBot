@@ -98,6 +98,8 @@ public class Main implements CommandLineRunner {
 
                 long totalChapters  = verseRepository.countDistinctChapterByBookId(Long.parseLong(data[0]));
 
+                log.info("Total chapter " + totalChapters);
+
                 InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
                 InlineKeyboardButton[] chaptersButtonsRow = new InlineKeyboardButton[4];
 
@@ -116,6 +118,9 @@ public class Main implements CommandLineRunner {
 
 
                 }
+
+                log.info(String.valueOf(inlineKeyboardMarkup));
+                log.info("inline message id " + query.inlineMessageId());
 
                 bot.execute(new EditMessageText(query.inlineMessageId(), Replies.SELECT_CHAPTER)
                         .replyMarkup(inlineKeyboardMarkup)
