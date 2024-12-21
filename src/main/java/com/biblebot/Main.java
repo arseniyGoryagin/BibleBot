@@ -110,7 +110,7 @@ public class Main implements CommandLineRunner {
             }
         };
 
-        bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId() ,Replies.SELECT_BOOK)
+        bot.execute(new EditMessageText(query.message().chat().id(), query.message().messageId() , page.getText())
                 .replyMarkup(page.getInlineKeyboardMarkup())
         );
 
