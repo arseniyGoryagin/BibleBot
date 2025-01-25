@@ -12,7 +12,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/BIBLEBOT
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
-      BOT_TOKEN: 8067145847:AAEHAi52KgsgrUcdWY-CvDaELZgZv3n5u7Q
+      BOT_TOKEN: YOUR-TOKEN
     ports:
       - "8080:8080"
 
