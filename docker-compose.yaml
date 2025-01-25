@@ -1,0 +1,31 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image : biblebot
+    container_name: biblebot
+    depends_on:
+      - database
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/BIBLEBOT
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      BOT_TOKEN: 8067145847:AAEHAi52KgsgrUcdWY-CvDaELZgZv3n5u7Q
+    ports:
+      - "8080:8080"
+
+
+  database:
+    image: postgres:latest
+    container_name: database
+    restart: always
+    environment:
+      POSTGRES_DB: BIBLEBOT
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./src/main/resources/db/BibleVersesSql.sql:/docker-entrypoint-initdb.d/init.sql
+
+
